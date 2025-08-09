@@ -11,6 +11,7 @@ This project predicts the effectiveness of chemical compounds against the influe
 ├── data/              # Data storage
 │   ├── processed/     # Processed data ready for modeling
 │   └── raw/           # Raw data files
+├── experiments/       # Experiment tracking logs
 ├── figures/          # Generated plots and figures
 ├── logs/             # Log files
 ├── models/            # Trained models
@@ -22,7 +23,11 @@ This project predicts the effectiveness of chemical compounds against the influe
 │   ├── features/      # Feature engineering scripts
 │   ├── models/        # Model training scripts
 │   └── utils/         # Utility functions
-└── Makefile           # Build automation
+├── .github/           # GitHub Actions workflows
+├── .pre-commit-config.yaml  # Pre-commit configuration
+├── Makefile           # Build automation
+├── requirements.lock.txt    # Environment lock file (read-only)
+└── requirements.txt   # Base dependencies
 ```
 
 ## Data
@@ -105,6 +110,29 @@ conda run -p /home/gna/anaconda3/envs/rocm python src/data/process_data.py
 conda activate /home/gna/anaconda3/envs/rocm
 python src/data/process_data.py
 ```
+
+## Environment Lock File
+
+A complete list of dependencies used in this project is available in [requirements.lock.txt](requirements.lock.txt).
+
+**Note**: This file is for reference purposes only and should not be used for installation. The frozen environment has been fully captured but may contain platform-specific packages that might not work on other systems. Use `requirements.txt` for base dependencies instead.
+
+## Pre-commit Hooks
+
+This project uses pre-commit hooks for code quality and consistency:
+- **ruff**: Linting and code formatting
+- **black**: Code formatting
+- **isort**: Import sorting
+- **nbstripout**: Jupyter notebook output removal
+
+To install and enable pre-commit hooks:
+```bash
+pre-commit install
+```
+
+## Experiment Tracking
+
+Experiments are tracked in [experiments/registry.jsonl](experiments/registry.jsonl) with the append_jsonl utility.
 
 ## Project Documentation
 

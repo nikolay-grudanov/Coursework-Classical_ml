@@ -1,0 +1,5 @@
+{
+  "split_before_preprocess": true,
+  "smote_train_only": true,
+  "no_target_leakage": true
+}
