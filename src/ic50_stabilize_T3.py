@@ -23,10 +23,19 @@ import joblib
 ROOT = Path('.')
 ART = ROOT / 'artifacts'
 REPORTS = ROOT / 'reports'
+FIGS = ROOT / 'figs'
 ART.mkdir(exist_ok=True)
 REPORTS.mkdir(exist_ok=True)
+FIGS.mkdir(exist_ok=True)
 
-DATA_PATH = '/home/gna/workspase/education/MEPHI/Coursework-Classical_ml/data/data.xlsx'
+import os
+try:
+    from dotenv import load_dotenv
+    load_dotenv()
+        except Exception:
+            pass
+
+DATA_PATH = os.environ.get('DATA_PATH', '/home/gna/workspase/education/MEPHI/Coursework-Classical_ml/data/data.xlsx')
 
 def find_col(cols, keyword):
     keyword = keyword.lower()

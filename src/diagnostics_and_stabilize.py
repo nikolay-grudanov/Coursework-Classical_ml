@@ -22,6 +22,13 @@ from sklearn.model_selection import KFold, StratifiedKFold
 from sklearn.metrics import mean_squared_error, mean_absolute_error, r2_score, roc_curve, precision_recall_curve, auc
 from imblearn.over_sampling import SMOTE
 
+import os
+try:
+    from dotenv import load_dotenv
+    load_dotenv()
+    except Exception:
+    pass
+
 ROOT = Path('.')
 ART = ROOT / 'artifacts'
 REPORTS = ROOT / 'reports'
@@ -29,7 +36,7 @@ FIGS = ROOT / 'figures'
 REPORTS.mkdir(exist_ok=True)
 FIGS.mkdir(exist_ok=True)
 
-DATA_PATH = '/home/gna/workspase/education/MEPHI/Coursework-Classical_ml/data/data.xlsx'
+DATA_PATH = os.environ.get('DATA_PATH', '/home/gna/workspase/education/MEPHI/Coursework-Classical_ml/data/data.xlsx')
 
 # 1) Verify artifacts exist and readable
 artifact_files = [
@@ -300,3 +307,4 @@ for k,v in robust_results.items():
 print('\nFigures saved:')
 for f in fig_links:
     print('-', f)
+

@@ -144,6 +144,9 @@ ENV/
 env.bak/
 venv.bak/
 
+# Env files
+.env
+
 # Spyder project settings
 .spyderproject
 .spyproject
@@ -211,7 +214,11 @@ __marimo__/
 # Project specific exclusions
 data/raw/
 data/processed/
+data/*.csv
 models/
 logs/
 outputs/
+artifacts/
+reports/
+figures/
 

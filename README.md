@@ -4,7 +4,6 @@ This project predicts the effectiveness of chemical compounds against the influe
 
 ## Project Structure
 
-```
 .
 ├── analysis/          # Exploratory data analysis results
 ├── configs/           # Configuration files
@@ -12,10 +11,10 @@ This project predicts the effectiveness of chemical compounds against the influe
 │   ├── processed/     # Processed data ready for modeling
 │   └── raw/           # Raw data files
 ├── experiments/       # Experiment tracking logs
-├── figures/          # Generated plots and figures
-├── logs/             # Log files
+├── figures/           # Generated plots and figures
+├── logs/              # Log files
 ├── models/            # Trained models
-├── notebooks/          # Jupyter notebooks for exploration
+├── notebooks/         # Jupyter notebooks for exploration
 ├── reports/           # Generated reports
 ├── src/               # Source code
 │   ├── data/          # Data processing scripts
@@ -23,20 +22,20 @@ This project predicts the effectiveness of chemical compounds against the influe
 │   ├── features/      # Feature engineering scripts
 │   ├── models/        # Model training scripts
 │   └── utils/         # Utility functions
+├── scripts/           # Helper scripts (activation, env loading, etc.)
 ├── .github/           # GitHub Actions workflows
 ├── .pre-commit-config.yaml  # Pre-commit configuration
-├── Makefile           # Build automation
+├── .env.example       # Example environment overrides
+├── Makefile           # Build automation (reads .env if present)
 ├── requirements.lock.txt    # Environment lock file (read-only)
 └── requirements.txt   # Base dependencies
-```
-
 ## Data
 
 The dataset contains 1,000 chemical compounds with features representing their chemical properties and effectiveness metrics:
 
-- **IC50**: Half maximal inhibitory concentration (lower is better)
-- **CC50**: Half maximal cytotoxic concentration (higher is better)
-- **SI**: Selectivity index (CC50/IC50, higher is better)
+- IC50: Half maximal inhibitory concentration (lower is better)
+- CC50: Half maximal cytotoxic concentration (higher is better)
+- SI: Selectivity index (CC50/IC50, higher is better)
 
 ## Tasks
 
@@ -50,106 +49,99 @@ The dataset contains 1,000 chemical compounds with features representing their c
 
 ## Environment Setup
 
-This project uses a conda environment located at `/home/gna/anaconda3/envs/rocm`.
+This project uses a conda environment. Instead of hard-coding a path, configure your local conda environment via a .env file in the repository root.
 
-### Using the rocm environment
+Copy the example .env:
+cp .env.example .env
 
-All experiments and pipelines are run only in the rocm environment for reproducibility and compatibility of the GPU/ROCm stack.
+Supported .env variables (set one or more as appropriate):
 
-The project is configured to automatically use the rocm environment through:
+- CONDA_PREFIX — full path to your conda environment, e.g. /home/user/miniconda3/envs/ml
+- CONDA_ENV_NAME — environment name (alternative, e.g. ml)
+- CONDA_BIN — path to conda binary directory (optional fallback), e.g. /home/user/miniconda3/bin
+- DATA_PATH — override default data directory (optional), e.g. /mnt/data/project/data
 
-- **VS Code Settings**: See [.vscode/settings.json](.vscode/settings.json) for Python interpreter configuration
-- **Makefile Targets**: All Makefile commands automatically use the rocm environment
+Example .env (see .env.example):
+CONDA_PREFIX=/home/user/miniconda3/envs/ml
+CONDA_ENV_NAME=ml
+CONDA_BIN=/home/user/miniconda3/bin
+DATA_PATH=/path/to/data
 
+Activation and usage:
+
+- Source the helper script which reads .env and prepares the environment for Makefile targets and scripts:
+source scripts/activate_env.sh
+
+- Or activate the environment manually using the variables from .env:
+conda activate /path/from/.env/CONDA_PREFIX
+# or
+conda activate CONDA_ENV_NAME_from_.env
+
+- You can also run scripts with conda run using the CONDA_PREFIX value:
+conda run -p $CONDA_PREFIX python src/data/process_data.py
+
+Makefile targets and project scripts will read .env if present. For data path overrides, set DATA_PATH in .env or export DATA_PATH before running scripts.
 ### Installation/Startup
 
-To set up and run the project:
-
-1. **Activate the conda environment**:
+1. Ensure .env is configured (copy .env.example and edit as needed)
+2. **Activate the conda environment**:
    ```bash
-conda activate /home/gna/anaconda3/envs/rocm
-```
-
-2. **Install dependencies** (if needed):
-```bash
-   make install
-```
-
-3. **Run the complete pipeline**:
-```bash
-   make all
-```
-
-4. **Or run individual pipeline steps**:
-   ```bash
-   # Process raw data
-   make data
-
-   # Engineer features
-   make features
-
-   # Train models
-   make train
-
-   # Evaluate models
-   make evaluate
-
-   # Generate reports
-   make report
-
-   # Run exploratory data analysis
-   make eda
+   # Preferred: use helper script that reads .env
+source scripts/activate_env.sh
+   # Or activate manually using full prefix stored in .env (e.g. CONDA_PREFIX=/home/mrr/miniconda3/envs/ml)
+   conda activate /home/mrr/miniconda3/envs/ml
    ```
+3. Install dependencies (if needed):
+   make install
+4. Run the complete pipeline:
+   make all
+5. Or run individual pipeline steps:
+make data        # Process raw data
+make features    # Engineer features
+make train       # Train models
+make evaluate    # Evaluate models
+make report      # Generate reports
+make eda         # Run exploratory data analysis
 
-Alternatively, you can run scripts directly with the conda environment:
-```bash
-# Using conda run (recommended)
-conda run -p /home/gna/anaconda3/envs/rocm python src/data/process_data.py
-
-# Or activate the environment first
-conda activate /home/gna/anaconda3/envs/rocm
+Alternatively, run scripts directly with the configured conda environment:
+conda run -p $CONDA_PREFIX python src/data/process_data.py
+# Or activate the environment first:
+conda activate $CONDA_PREFIX
 python src/data/process_data.py
-```
-
 ## Environment Lock File
 
-A complete list of dependencies used in this project is available in [requirements.lock.txt](requirements.lock.txt).
+A complete list of dependencies used in this project is available in requirements.lock.txt.
 
-**Note**: This file is for reference purposes only and should not be used for installation. The frozen environment has been fully captured but may contain platform-specific packages that might not work on other systems. Use `requirements.txt` for base dependencies instead.
+Note: This file is for reference purposes only and should not be used for installation. The frozen environment may contain platform-specific packages that might not work on other systems. Use requirements.txt for base dependencies instead.
 
 ## Pre-commit Hooks
 
 This project uses pre-commit hooks for code quality and consistency:
-- **ruff**: Linting and code formatting
-- **black**: Code formatting
-- **isort**: Import sorting
-- **nbstripout**: Jupyter notebook output removal
+- ruff: Linting and code formatting
+- black: Code formatting
+- isort: Import sorting
+- nbstripout: Jupyter notebook output removal
 
 To install and enable pre-commit hooks:
-```bash
 pre-commit install
-```
-
 ## Experiment Tracking
 
-Experiments are tracked in [experiments/registry.jsonl](experiments/registry.jsonl) with the append_jsonl utility.
+Experiments are tracked in experiments/registry.jsonl with the append_jsonl utility.
 
 ## Project Documentation
 
-This project includes comprehensive documentation in the `reports/` directory:
+This project includes documentation in the reports/ directory:
+- reports/eda_report.md - Detailed analysis of the dataset, feature distributions, and preprocessing steps
+- reports/final_report.md - Complete project findings, methodology, results, and conclusions
+- docs/standards.md - Coding standards, project structure guidelines, and best practices
 
-- [Exploratory Data Analysis Report](reports/eda_report.md) - Detailed analysis of the dataset, feature distributions, and preprocessing steps
-- [Final Report](reports/final_report.md) - Complete project findings, methodology, results, and conclusions
-- [Project Standards](docs/standards.md) - Coding standards, project structure guidelines, and best practices
-
-## Usage
-
+## Usage and Outputs
 The project generates several outputs:
-- Processed data in `data/processed/`
-- Trained models in `models/`
-- Evaluation results in `reports/`
-- Visualizations in `figures/`
-- Logs in `logs/`
+- Processed data in data/processed/
+- Trained models in models/
+- Evaluation results in reports/
+- Visualizations in figures/
+- Logs in logs/
 
 All processing should be done through the Makefile targets which ensure the proper environment is used.
 

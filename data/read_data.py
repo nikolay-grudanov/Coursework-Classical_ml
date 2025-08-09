@@ -1,27 +1,39 @@
 import pandas as pd
+import os
 import matplotlib.pyplot as plt
 import seaborn as sns
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LinearRegression, LogisticRegression
 from sklearn.metrics import mean_squared_error, r2_score, accuracy_score, classification_report
 from sklearn.ensemble import RandomForestClassifier
-from imblearn.over_sampling import SMOTE
+try:
+    from imblearn.over_sampling import SMOTE
+    HAS_SMOTE = True
+except Exception:
+    HAS_SMOTE = False
 
+# Allow DATA_PATH override via environment or .env
+DATA_PATH = os.environ.get('DATA_PATH', 'data/data.xlsx')
 # Load the data from the Excel file
-data = pd.read_excel('/home/gna/workspase/education/MEPHI/Coursework-Classical_ml/data/data.xlsx')
+print(f"Loading data from {DATA_PATH}")
+data = pd.read_excel(DATA_PATH)
 
 # Drop the 'Unnamed: 0' column
-data.drop(columns=['Unnamed: 0'], inplace=True)
+if 'Unnamed: 0' in data.columns:
+    data.drop(columns=['Unnamed: 0'], inplace=True)
 
 # Calculate the Selectivity Index (SI) if not present
 if 'SI' not in data.columns:
-    data['SI'] = data['CC50, mM'] / data['IC50, mM']
+    if 'CC50, mM' in data.columns and 'IC50, mM' in data.columns:
+        data['SI'] = data['CC50, mM'] / data['IC50, mM']
+    else:
+        data['SI'] = 0
 
 # Handle missing values by filling them with the median of their respective columns
 data.fillna(data.median(), inplace=True)
 
 # Define features and target variables
-features = data.drop(columns=['IC50, mM', 'CC50, mM', 'SI'])
+features = data.drop(columns=[col for col in ['IC50, mM', 'CC50, mM', 'SI'] if col in data.columns])
 target_ic50 = data['IC50, mM']
 target_cc50 = data['CC50, mM']
 target_si = data['SI']
@@ -96,12 +108,18 @@ _, _, train_cc50_class, test_cc50_class = train_test_split(features, data['CC50_
 _, _, train_si_class, test_si_class = train_test_split(features, data['SI_above_median'], test_size=0.2, random_state=42)
 _, _, train_si_8_class, test_si_8_class = train_test_split(features, data['SI_above_8'], test_size=0.2, random_state=42)
 
-# Apply SMOTE to handle class imbalance
+# Apply SMOTE to handle class imbalance (if available)
+if HAS_SMOTE:
 smote = SMOTE(random_state=42)
 train_features_res_ic50, train_ic50_class_res = smote.fit_resample(train_features, train_ic50_class)
 train_features_res_cc50, train_cc50_class_res = smote.fit_resample(train_features, train_cc50_class)
 train_features_res_si, train_si_class_res = smote.fit_resample(train_features, train_si_class)
 train_features_res_si_8, train_si_8_class_res = smote.fit_resample(train_features, train_si_8_class)
+else:
+    train_features_res_ic50, train_ic50_class_res = train_features, train_ic50_class
+    train_features_res_cc50, train_cc50_class_res = train_features, train_cc50_class
+    train_features_res_si, train_si_class_res = train_features, train_si_class
+    train_features_res_si_8, train_si_8_class_res = train_features, train_si_8_class
 
 # Initialize and train the classification models
 model_ic50_class = RandomForestClassifier(random_state=42)
@@ -160,3 +178,4 @@ print(f'SI > 8 Classification - Accuracy: {accuracy_si_8}')
 print('The regression models show moderate performance with R2 values indicating the proportion of variance explained.')
 print('The classification models, after addressing class imbalance with SMOTE and using Random Forest, show improved accuracy and balanced performance across classes.')
 print('The CC50 classification model performs the best among the classification tasks, followed by IC50, SI, and SI > 8.')
+

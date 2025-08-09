@@ -2,6 +2,7 @@
 
 # Variables
 PYTHON := python3
+# CONDA_ENV can be a full prefix path or an environment name. If a .env file exists, it will override this value.
 CONDA_ENV := /home/gna/anaconda3/envs/rocm
 SRC_DIR := src
 DATA_DIR := data
@@ -9,6 +10,19 @@ MODELS_DIR := models
 REPORTS_DIR := reports
 FIGURES_DIR := figures
 LOGS_DIR := logs
+
+# If .env exists, try to load CONDA_PREFIX or CONDA_ENV_NAME
+ifneq (,$(wildcard .env))
+include .env
+export
+# If CONDA_PREFIX is set in .env, use it as CONDA_ENV
+ifneq (,$(CONDA_PREFIX))
+CONDA_ENV := $(CONDA_PREFIX)
+endif
+ifneq (,$(CONDA_ENV_NAME))
+CONDA_ENV := $(CONDA_ENV_NAME)
+endif
+endif
 
 # Default target
 .PHONY: all
@@ -81,7 +95,8 @@ ic50_stability:
 .PHONY: si8_oof
 si8_oof:
 	@echo "Generate OOF predictions and plots for SI>=8 classification"
-	@conda run -p $(CONDA_ENV) $(PYTHON) $(SRC_DIR)/si8_oof.py
+	@conda run -p $(CONDA_ENV) $(PYTHON) -m pip install --quiet PyYAML >/dev/null 2>&1 || true
+	@conda run -p $(CONDA_ENV) $(PYTHON) $(SRC_DIR)/eval/generate_baselines_t3.py
 
 .PHONY: baselines_t3
 baselines_t3:
