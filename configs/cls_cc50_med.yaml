@@ -1,0 +1,13 @@
+# Classification: CC50 > median
+model: LogisticRegression
+target: CC50_above_median
+features: null
+cv_folds: 5
+random_state: 42
+hyperparameters:
+  C: 1.0
+  penalty: l2
+output: artifacts/cls_cc50_med_model.joblib
+reports:
+  metrics: reports/cls_cc50_med_metrics.json
+  figures_dir: reports/figures/cls_cc50_med

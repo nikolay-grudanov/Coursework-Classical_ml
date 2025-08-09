@@ -1,0 +1,11 @@
+# Configuration for SI regression
+model: RandomForest
+target: SI
+features: null
+cv_folds: 5
+random_state: 42
+hyperparameters: {}
+output: artifacts/si_model.joblib
+reports:
+  metrics: reports/si_metrics.json
+  figures_dir: reports/figures/si

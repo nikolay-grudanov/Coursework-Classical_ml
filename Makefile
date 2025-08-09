@@ -72,6 +72,23 @@ notebooks:
 	@echo "Starting Jupyter notebook..."
 	@conda run -p $(CONDA_ENV) jupyter notebook notebooks/
 
+# Additional targets for coursework
+.PHONY: ic50_stability
+ic50_stability:
+	@echo "Running IC50 stabilization experiments (do not run by default)"
+	@conda run -p $(CONDA_ENV) $(PYTHON) $(SRC_DIR)/ic50_stabilize_T3.py
+
+.PHONY: si8_oof
+si8_oof:
+	@echo "Generate OOF predictions and plots for SI>=8 classification"
+	@conda run -p $(CONDA_ENV) $(PYTHON) $(SRC_DIR)/si8_oof.py
+
+.PHONY: baselines_t3
+baselines_t3:
+	@echo "Generate baselines T3 report"
+	@$(PYTHON) -m pip install --quiet PyYAML >/dev/null 2>&1 || true
+	@$(PYTHON) $(SRC_DIR)/eval/generate_baselines_t3.py
+
 # Help
 .PHONY: help
 help:
@@ -86,4 +103,7 @@ help:
 	@echo "  eda       - Run exploratory data analysis"
 	@echo "  install   - Install dependencies"
 	@echo "  notebooks - Start Jupyter notebook"
+	@echo "  ic50_stability - Run IC50 stabilization script (explicit)"
+	@echo "  si8_oof   - Generate OOF predictions/plots for SI>=8 classification"
+	@echo "  baselines_t3 - Generate baselines T3 summary report"
 	@echo "  help      - Show this help message"

@@ -1,0 +1,12 @@
+# Configuration for CC50 regression
+# Fill parameters as needed
+model: RandomForest
+target: CC50
+features: null
+cv_folds: 5
+random_state: 42
+hyperparameters: {}
+output: artifacts/cc50_model.joblib
+reports:
+  metrics: reports/cc50_metrics.json
+  figures_dir: reports/figures/cc50
