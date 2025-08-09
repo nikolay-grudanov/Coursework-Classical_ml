@@ -207,3 +207,11 @@ marimo/_lsp/
 __marimo__/
 
 .continue/**
+
+# Project specific exclusions
+data/raw/
+data/processed/
+models/
+logs/
+outputs/
+

@@ -1,0 +1,6 @@
+{
+    "python.defaultInterpreterPath": "/home/gna/anaconda3/envs/rocm/bin/python",
+    "python.terminal.activateEnvironment": true,
+    "python.terminal.activateEnvInCurrentTerminal": true,
+    "python.condaPath": "/home/gna/anaconda3/bin/conda"
+}

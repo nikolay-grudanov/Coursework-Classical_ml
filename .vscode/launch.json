@@ -1,0 +1,29 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Python: Current File",
+            "type": "python",
+            "request": "launch",
+            "program": "${file}",
+            "console": "integratedTerminal",
+            "python": "/home/gna/anaconda3/envs/rocm/bin/python"
+        },
+        {
+            "name": "Python: Module",
+            "type": "python",
+            "request": "launch",
+            "module": "src.data.process_data",
+            "console": "integratedTerminal",
+            "python": "/home/gna/anaconda3/envs/rocm/bin/python"
+        },
+        {
+            "name": "Python: EDA",
+            "type": "python",
+            "request": "launch",
+            "module": "src.data.eda",
+            "console": "integratedTerminal",
+            "python": "/home/gna/anaconda3/envs/rocm/bin/python"
+        }
+    ]
+}

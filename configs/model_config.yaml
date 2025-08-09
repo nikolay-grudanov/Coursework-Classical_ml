@@ -1,0 +1,52 @@
+# Model configuration parameters
+
+# Data paths
+data_path: "/home/gna/workspase/education/MEPHI/Coursework-Classical_ml/data/data.xlsx"
+processed_data_path: "data/processed_data.csv"
+
+# Random seed for reproducibility
+random_state: 42
+
+# Test set size
+test_size: 0.2
+
+# Regression models to evaluate
+regression_models:
+  - LinearRegression
+  - RandomForestRegressor
+  - LightGBM
+
+# Classification models to evaluate
+classification_models:
+  - LogisticRegression
+  - RandomForestClassifier
+  - LightGBM
+
+# Hyperparameter search parameters
+regression_params:
+  RandomForestRegressor:
+    n_estimators: [50, 100]
+    max_depth: [None, 10, 20]
+    min_samples_split: [2, 5]
+  LightGBM:
+    n_estimators: [50, 100]
+    max_depth: [3, 5, 10]
+    learning_rate: [0.01, 0.1]
+
+classification_params:
+  LogisticRegression:
+    C: [0.1, 1, 10]
+  RandomForestClassifier:
+    n_estimators: [50, 100]
+    max_depth: [None, 10, 20]
+    min_samples_split: [2, 5]
+  LightGBM:
+    n_estimators: [50, 100]
+    max_depth: [3, 5, 10]
+    learning_rate: [0.01, 0.1]
+
+# Cross-validation settings
+cv_folds: 5
+scoring: 
+  regression: "r2"
+  classification: "accuracy"
