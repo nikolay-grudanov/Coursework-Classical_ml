@@ -1,0 +1,122 @@
+{
+  "sanity_flags": {
+    "split_before_preprocess": true,
+    "smote_train_only": true,
+    "no_target_leakage": true
+  },
+  "artifact_info": {
+    "training_report_v2.json": {
+      "path": "artifacts/training_report_v2.json",
+      "exists": true,
+      "size_bytes": 4914,
+      "modified_time": "2025-08-09T13:53:24.656233",
+      "load_ok": true,
+      "load_type": "json",
+      "report": "reports/baselines_T3.md",
+      "figure": "reports/figures/training_report_v2_overview.png"
+    },
+    "ic50_LinearRegression.joblib": {
+      "path": "artifacts/ic50_LinearRegression.joblib",
+      "exists": true,
+      "size_bytes": 23337,
+      "modified_time": "2025-08-09T13:52:51.823561",
+      "load_ok": true,
+      "load_type": "joblib_dict",
+      "report": "reports/baselines_T3.md",
+      "figure": "reports/figures/ic50_LinearRegression_fold1.png"
+    },
+    "ic50_RandomForest.joblib": {
+      "path": "artifacts/ic50_RandomForest.joblib",
+      "exists": true,
+      "size_bytes": 8942802,
+      "modified_time": "2025-08-09T13:53:14.810420",
+      "load_ok": true,
+      "load_type": "joblib_dict",
+      "report": "reports/baselines_T3.md",
+      "figure": "reports/figures/ic50_RandomForest_fold1.png"
+    },
+    "si8_LogisticRegression.joblib": {
+      "path": "artifacts/si8_LogisticRegression.joblib",
+      "exists": true,
+      "size_bytes": 21993,
+      "modified_time": "2025-08-09T13:53:15.069179",
+      "load_ok": true,
+      "load_type": "joblib_dict",
+      "report": "reports/baselines_T3.md",
+      "figure": "reports/figures/si8_LogisticRegression_fold1.png"
+    },
+    "si8_GradientBoosting.joblib": {
+      "path": "artifacts/si8_GradientBoosting.joblib",
+      "exists": true,
+      "size_bytes": 203947,
+      "modified_time": "2025-08-09T13:53:24.656016",
+      "load_ok": true,
+      "load_type": "joblib_dict",
+      "report": "reports/baselines_T3.md",
+      "figure": "reports/figures/si8_GradientBoosting_fold1.png"
+    }
+  },
+  "ic50_stats": {
+    "describe": {
+      "count": 1001.0,
+      "mean": 222.8051558775471,
+      "std": 402.1697344150823,
+      "min": 0.003516693745208505,
+      "25%": 12.51539592355676,
+      "50%": 46.58518345980803,
+      "75%": 224.9759275757494,
+      "max": 4128.529376550779
+    },
+    "num_outliers_1.5iqr": 147,
+    "prop_outliers": 0.14685314685314685,
+    "num_extreme_3iqr": 89,
+    "prop_extreme": 0.08891108891108891
+  },
+  "top10_correlations": [
+    [
+      "VSA_EState4",
+      -0.2742028526793648
+    ],
+    [
+      "Chi2n",
+      -0.2570577822396475
+    ],
+    [
+      "PEOE_VSA7",
+      -0.25598819411341944
+    ],
+    [
+      "Chi2v",
+      -0.2491643888208122
+    ],
+    [
+      "fr_Ar_NH",
+      0.24551146802507362
+    ],
+    [
+      "fr_Nhpyrrole",
+      0.24551146802507362
+    ],
+    [
+      "Chi4v",
+      -0.24360024334630828
+    ],
+    [
+      "Chi4n",
+      -0.24349740851700583
+    ],
+    [
+      "Chi3n",
+      -0.23974072598667898
+    ],
+    [
+      "Chi3v",
+      -0.23775923177806643
+    ]
+  ],
+  "zero_variance_count": 18,
+  "figures": [
+    "reports/figures/si8_LogisticRegression_fold1.png",
+    "reports/figures/si8_GradientBoosting_fold1.png"
+  ]
+}

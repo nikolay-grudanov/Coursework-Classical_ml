@@ -1,0 +1,7 @@
+model,rmse_mean,mae_mean,r2_mean,notes,report,figure
+LinearRegression,213107222382769.56,15148682082474.031,-1.6219117882660325e+24,baseline,reports/baselines_T3.md,reports/figures/LinearRegression.png
+RandomForest,331.68343232124215,199.27424543132923,0.23700074437803198,baseline,reports/baselines_T3.md,reports/figures/RandomForest.png
+LinearRegression_robust,8055585018046.065,569615912674.3899,-3.5043738868963313e+21,log1p+RobustScaler,reports/baselines_T3.md,reports/figures/LinearRegression_robust.png
+Ridge_robust,1.6069737810847756e+21,1.1363020577940315e+20,-1.3945545081007197e+38,log1p+RobustScaler,reports/baselines_T3.md,reports/figures/Ridge_robust.png
+RandomForest_robust,337.26163365631646,170.7275541773192,0.2328043063302661,log1p+RobustScaler,reports/baselines_T3.md,reports/figures/RandomForest_robust.png
+
