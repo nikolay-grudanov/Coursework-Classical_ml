@@ -4,6 +4,7 @@ This project predicts the effectiveness of chemical compounds against the influe
 
 ## Project Structure
 
+```
 .
 ├── analysis/          # Exploratory data analysis results
 ├── configs/           # Configuration files
@@ -29,6 +30,8 @@ This project predicts the effectiveness of chemical compounds against the influe
 ├── Makefile           # Build automation (reads .env if present)
 ├── requirements.lock.txt    # Environment lock file (read-only)
 └── requirements.txt   # Base dependencies
+```
+
 ## Data
 
 The dataset contains 1,000 chemical compounds with features representing their chemical properties and effectiveness metrics:
