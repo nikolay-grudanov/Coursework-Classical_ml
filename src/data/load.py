@@ -1,5 +1,4 @@
-"""
-Module for data loading and documentation of data sources.
+"""Module for data loading and documentation of data sources.
 """
 import pandas as pd
 import logging
