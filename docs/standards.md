@@ -1,54 +1,54 @@
-# Data Science Project Standards
+# Стандарты проекта по Data Science
 
-This document outlines the established standards for the MEPHI Coursework-Classical ML project based on industry best practices and project requirements.
+В этом документе описаны стандарты проекта MEPHI Coursework-Classical ML, основанные на отраслевых практиках и требованиях курса.
 
-## Project Structure
-- `/data`: Contains raw and processed datasets
-- `/src`: Source code for data processing, modeling, and analysis
-- `/notebooks`: Jupyter notebooks for exploration and experimentation
-- `/reports`: Generated reports including EDA, model evaluations
-- `/models`: Saved trained models and preprocessing objects
-- `/configs`: Configuration files for preprocessing, modeling, and validation
-- `/figures`: Generated visualizations and figures
-- `/analysis`: Detailed analysis outputs (feature importance, residuals, etc.)
-- `/logs`: Log files from experiments and training runs
+## Структура проекта
+- `/data`: Сырые и обработанные наборы данных
+- `/src`: Исходный код для обработки данных, моделирования и анализа
+- `/notebooks`: Jupyter-ноутбуки для исследования и экспериментов
+- `/reports`: Сгенерированные отчёты (EDA, оценка моделей и пр.)
+- `/models`: Сохранённые обученные модели и объекты препроцессинга
+- `/configs`: Конфигурационные файлы для препроцессинга, обучения и валидации
+- `/figures`: Построенные визуализации и рисунки
+- `/analysis`: Детальные результаты анализа (важность признаков, остатки и т.п.)
+- `/logs`: Логи экспериментов и обучений
 
-## Code Standards
-- All Python code must follow PEP8 style guidelines
-- Use type hints for function parameters and return values
-- Modularize code with clear separation of concerns (data loading, preprocessing, modeling, evaluation)
-- Document all functions with docstrings explaining purpose, parameters, and return values
-- Use meaningful variable and function names that clearly describe their purpose
+## Стандарты кода
+- Весь Python-код должен соответствовать PEP8
+- Использовать аннотации типов (type hints) для параметров функций и возвращаемых значений
+- Модульность: чёткое разделение ответственности (загрузка данных, препроцессинг, моделирование, оценка)
+- Документировать функции докстрингами (цель, параметры, возвращаемые значения)
+- Использовать осмысленные имена переменных и функций
 
-## Reproducibility Requirements
-- Fix all random seeds for reproducibility (numpy, sklearn, pandas)
-- Use virtual environment with fixed dependency versions (requirements.txt or pyproject.toml)
-- Configuration files should control all hyperparameters and data paths
-- All experiment results should be logged with parameters and metrics
+## Воспроизводимость
+- Фиксировать все случайные состояния (numpy, sklearn, и т.д.) для воспроизводимости
+- Использовать виртуальное окружение с зафиксированными версиями зависимостей (requirements.txt или pyproject.toml)
+- Все гиперпараметры и пути к данным должны управляться конфигурационными файлами
+- Логировать все результаты экспериментов вместе с параметрами и метриками
 
-## Git Workflow
-- Use feature branches for development work
-- Commit messages should be clear and descriptive
-- Small, focused commits that accomplish a single task
-- Branch naming convention: feature/task-name, fix/issue-description
+## Git-воркфлоу
+- Использовать feature-ветки для разработки
+- Сообщения коммитов должны быть ясными и информативными
+- Делать небольшие, фокусированные коммиты, решающие одну задачу
+- Шаблон имен веток: `feature/имя-задачи`, `fix/описание-ошибки`
 
-## Data Handling
-- Never commit raw data files to the repository
-- Document data sources and transformations
-- Preserve raw data and create processed versions
-- Identify and handle missing values appropriately
-- Check for data leakage between features and targets
+## Обработка данных
+- Никогда не коммитить сырые данные в репозиторий
+- Документировать источники данных и трансформации
+- Сохранять исходные данные и создавать отдельные обработанные версии
+- Выявлять и корректно обрабатывать пропуски
+- Проверять отсутствие утечки данных (data leakage) между признаками и целями
 
-## Modeling Standards
-- Split data before any preprocessing to prevent leakage
-- Use cross-validation for model evaluation
-- For classification tasks with imbalance, apply techniques like SMOTE
-- Validate splits are stratified for classification tasks
-- Evaluate models with appropriate metrics:
-  * Regression: RMSE, MAE, R2
-  * Classification: ROC-AUC, PR-AUC, F1 (macro), accuracy
+## Стандарты моделирования
+- Делить данные на train/test до любой трансформации, чтобы избежать утечки
+- Использовать кросс-валидацию для оценки моделей
+- Для несбалансированных задач классификации применять методы (например, SMOTE) при необходимости
+- Для классификации обеспечивать стратифицированные разбиения
+- Использовать соответствующие метрики оценки:
+  * Регрессия: RMSE, MAE, R2
+  * Классификация: ROC-AUC, PR-AUC, F1 (macro), accuracy
 
-## Experiment Tracking
-- Log all experiments with parameters and results
-- Save model configurations and trained models
-- Document findings and decisions in reports
+## Трекинг экспериментов
+- Логировать все эксперименты с параметрами и результатами
+- Сохранять конфигурации моделей и обученные артефакты
+- Документировать выводы и принятые решения в отчётах
