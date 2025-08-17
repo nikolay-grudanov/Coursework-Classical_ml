@@ -109,17 +109,25 @@ def create_features(data: pd.DataFrame) -> pd.DataFrame:
         data["SI"] = data["CC50, mM"] / data["IC50, mM"]
         logger.info("Calculated SI as CC50/IC50")
 
-    # Create binary targets for classification
-    data["IC50_above_median"] = (data["IC50, mM"] > data["IC50, mM"].median()).astype(
-        int
+    # Create binary targets for classification using a single concat to avoid
+    # pandas DataFrame fragmentation (PerformanceWarning).
+    new_cols = pd.DataFrame(
+        {
+            "IC50_above_median": (data["IC50, mM"] > data["IC50, mM"].median()).astype(
+                int
+            ),
+            "CC50_above_median": (data["CC50, mM"] > data["CC50, mM"].median()).astype(
+                int
+            ),
+            "SI_above_median": (data["SI"] > data["SI"].median()).astype(int),
+            "SI_above_8": (data["SI"] > 8).astype(int),
+        },
+        index=data.index,
     )
-    data["CC50_above_median"] = (data["CC50, mM"] > data["CC50, mM"].median()).astype(
-        int
-    )
-    data["SI_above_median"] = (data["SI"] > data["SI"].median()).astype(int)
-    data["SI_above_8"] = (data["SI"] > 8).astype(int)
 
-    logger.info("Created binary classification targets")
+    data = pd.concat([data, new_cols], axis=1)
+
+    logger.info("Created binary classification targets (concatenated columns)")
 
     return data
 

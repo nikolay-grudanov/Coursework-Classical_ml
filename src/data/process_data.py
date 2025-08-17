@@ -5,6 +5,7 @@ Makefile -> src/data/process_data.py
 This script calls existing data loading / preprocessing utilities in the repo
 and saves processed data to the configured path.
 """
+
 from pathlib import Path
 import logging
 import yaml
@@ -27,10 +28,28 @@ def load_config(config_path="configs/model_config.yaml"):
 
 def main():
     cfg = load_config()
-    data = load_data(cfg.get("data_path"))
+
+    # Resolve environment-like values in config (support ${VAR:-default} and $VAR)
+    import os
+
+    def resolve_path(val):
+        if not isinstance(val, str):
+            return val
+        # Handle ${VAR:-default} pattern
+        if val.startswith("${") and val.endswith("}") and ":-" in val:
+            inner = val[2:-1]
+            var, default = inner.split(":-", 1)
+            return os.environ.get(var, default)
+        # Fallback to expanding $VAR and ~
+        return os.path.expanduser(os.path.expandvars(val))
+
+    data_path = resolve_path(cfg.get("data_path"))
+    processed_path = resolve_path(cfg.get("processed_data_path"))
+
+    data = load_data(data_path)
     data = clean_data(data)
     data = create_features(data)
-    save_data(data, cfg.get("processed_data_path"))
+    save_data(data, processed_path)
     logger.info("Processed data saved")
 
 
