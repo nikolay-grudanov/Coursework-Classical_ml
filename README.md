@@ -1,150 +1,157 @@
-# Classical ML Coursework: Drug Effectiveness Prediction
+# Курсовой проект: Классические ML-методы для предсказания эффективности препаратов
 
-This project predicts the effectiveness of chemical compounds against the influenza virus using machine learning techniques.
+Проект предсказывает эффективность химических соединений (набор показателей IC50, CC50, SI) с помощью классических методов машинного обучения.
 
-## Project Structure
+## Структура проекта
 
 ```
 .
-├── analysis/          # Exploratory data analysis results
-├── configs/           # Configuration files
-├── data/              # Data storage
-│   ├── processed/     # Processed data ready for modeling
-│   └── raw/           # Raw data files
-├── experiments/       # Experiment tracking logs
-├── figures/           # Generated plots and figures
-├── logs/              # Log files
-├── models/            # Trained models
-├── notebooks/         # Jupyter notebooks for exploration
-├── reports/           # Generated reports
-├── src/               # Source code
-│   ├── data/          # Data processing scripts
-│   ├── eval/          # Model evaluation scripts
-│   ├── features/      # Feature engineering scripts
-│   ├── models/        # Model training scripts
-│   └── utils/         # Utility functions
-├── scripts/           # Helper scripts (activation, env loading, etc.)
-├── .github/           # GitHub Actions workflows
-├── .pre-commit-config.yaml  # Pre-commit configuration
-├── .env.example       # Example environment overrides
-├── Makefile           # Build automation (reads .env if present)
-├── requirements.lock.txt    # Environment lock file (read-only)
-└── requirements.txt   # Base dependencies
+├── analysis/          # Результаты разведочного анализа данных (EDA)
+├── configs/           # Конфигурационные файлы
+├── data/              # Данные
+│   ├── processed/     # Обработанные данные для моделирования
+│   └── raw/           # Сырые исходные файлы
+├── experiments/       # Логи экспериментов / трекинг
+├── figures/           # Построенные графики и фигуры
+├── logs/              # Логи выполнения
+├── models/            # Обученные модели и артефакты
+├── notebooks/         # Jupyter-ноутбуки для исследования
+├── reports/           # Сгенерированные отчёты
+├── src/               # Исходный код
+│   ├── data/          # Скрипты обработки данных
+│   ├── eval/          # Скрипты оценки моделей
+│   ├── features/      # Функции/скрипты для feature engineering
+│   ├── models/        # Обучение моделей
+│   └── utils/         # Утилиты
+├── scripts/           # Вспомогательные скрипты (активация env, проверки)
+├── .github/           # CI/CD (GitHub Actions)
+├── .pre-commit-config.yaml  # Настройка pre-commit хуков
+├── .env.example       # Пример .env-файла для локальной конфигурации
+├── Makefile           # Автоматизация задач (читает .env, если он есть)
+├── requirements.lock.txt    # Замороженный список зависимостей (только для справки)
+└── requirements.txt   # Базовые зависимости
 ```
 
-## Data
+## Данные
 
-The dataset contains 1,000 chemical compounds with features representing their chemical properties and effectiveness metrics:
+Набор содержит ~1000 соединений с численными показателями свойств молекул и целевыми метриками:
 
-- IC50: Half maximal inhibitory concentration (lower is better)
-- CC50: Half maximal cytotoxic concentration (higher is better)
-- SI: Selectivity index (CC50/IC50, higher is better)
+- IC50: концентрация, при которой достигается половинное ингибирование (меньше — лучше)
+- CC50: концентрация цитотоксичности (больше — лучше)
+- SI: Selectivity Index = CC50 / IC50 (больше — лучше)
 
-## Tasks
+## Задачи
 
-1. Regression for IC50
-2. Regression for CC50
-3. Regression for SI
-4. Classification: IC50 > median
-5. Classification: CC50 > median
-6. Classification: SI > median
-7. Classification: SI > 8
+1. Регрессия для IC50
+2. Регрессия для CC50
+3. Регрессия для SI
+4. Классификация: IC50 > медиана
+5. Классификация: CC50 > медиана
+6. Классификация: SI > медиана
+7. Классификация: SI > 8
 
-## Environment Setup
+## Конфигурация окружения и DATA_PATH
 
-This project uses a conda environment. Instead of hard-coding a path, configure your local conda environment via a .env file in the repository root.
+Проект рассчитан на conda-окружение. Вместо жёсткой записи пути в коде используйте `.env` в корне репозитория или задайте переменную окружения `DATA_PATH` перед запуском.
 
-Copy the example .env:
+Скопируйте пример и отредактируйте:
+
+```bash
 cp .env.example .env
+```
 
-Supported .env variables (set one or more as appropriate):
+Поддерживаемые переменные в `.env` (выберите подходящие для вашей системы):
 
-- CONDA_PREFIX — full path to your conda environment, e.g. /home/user/miniconda3/envs/ml
-- CONDA_ENV_NAME — environment name (alternative, e.g. ml)
-- CONDA_BIN — path to conda binary directory (optional fallback), e.g. /home/user/miniconda3/bin
-- DATA_PATH — override default data directory (optional), e.g. /mnt/data/project/data
+- CONDA_PREFIX — полный путь к conda-окружению, например `/home/user/miniconda3/envs/ml`
+- CONDA_ENV_NAME — имя окружения (альтернатива), например `ml`
+- CONDA_BIN — путь к каталогу с бинарниками conda (необязательно)
+- DATA_PATH — (опционально) переопределение пути к каталогу/файлу с данными, например `/mnt/data/project/data`
 
-Example .env (see .env.example):
-CONDA_PREFIX=/home/user/miniconda3/envs/ml
-CONDA_ENV_NAME=ml
-CONDA_BIN=/home/user/miniconda3/bin
-DATA_PATH=/path/to/data
+Если `DATA_PATH` задан в `.env` или экспортирован в окружении, скрипты и Makefile будут использовать его при загрузке данных. Это удобно для разных машин/CI:
 
-Activation and usage:
+```bash
+# пример: экспорт перед запуском
+export DATA_PATH=/mnt/data/project/data/data.xlsx
+make all
+```
 
-- Source the helper script which reads .env and prepares the environment for Makefile targets and scripts:
+Важно: стандартный конфиг в `configs/` использует шаблон вида `${DATA_PATH:-data/data.xlsx}` — это означает: возьми `DATA_PATH`, если задан, иначе используй `data/data.xlsx`.
+
+## Используемый scaler и гиперпараметры ElasticNet (фикс)
+
+В коде для регрессионных моделей используется StandardScaler (нулевое среднее, единичная дисперсия) — это повышает стабильность координатного спуска в ElasticNet/Ridge.
+
+Текущие гиперпараметры ElasticNet (применяются в GridSearchCV):
+
+- alpha (grid): [1e-2, 1e-1, 1.0, 10.0]
+- l1_ratio: [0.1, 0.5, 0.9]
+- max_iter: 50000
+- tol: 1e-4
+
+Эти настройки были выбраны для улучшения сходимости алгоритма и снижения предупреждений о несходимости (ConvergenceWarning).
+
+## Установка и запуск
+
+1. Настройте `.env` (см. выше)
+2. Активируйте conda-окружение (рекомендуется использовать `scripts/activate_env.sh`, если он у вас есть):
+
+```bash
 source scripts/activate_env.sh
+# или вручную
+conda activate /path/to/conda_prefix_or_name
+```
 
-- Or activate the environment manually using the variables from .env:
-conda activate /path/from/.env/CONDA_PREFIX
-# or
-conda activate CONDA_ENV_NAME_from_.env
+3. Установите зависимости (если нужно):
 
-- You can also run scripts with conda run using the CONDA_PREFIX value:
-conda run -p $CONDA_PREFIX python src/data/process_data.py
+```bash
+make install
+```
 
-Makefile targets and project scripts will read .env if present. For data path overrides, set DATA_PATH in .env or export DATA_PATH before running scripts.
-### Installation/Startup
+4. Запустите полный pipeline:
 
-1. Ensure .env is configured (copy .env.example and edit as needed)
-2. **Activate the conda environment**:
-   ```bash
-   # Preferred: use helper script that reads .env
-source scripts/activate_env.sh
-   # Or activate manually using full prefix stored in .env (e.g. CONDA_PREFIX=/home/mrr/miniconda3/envs/ml)
-   conda activate /home/mrr/miniconda3/envs/ml
-   ```
-3. Install dependencies (if needed):
-   make install
-4. Run the complete pipeline:
-   make all
-5. Or run individual pipeline steps:
-make data        # Process raw data
-make features    # Engineer features
-make train       # Train models
-make evaluate    # Evaluate models
-make report      # Generate reports
-make eda         # Run exploratory data analysis
+```bash
+make all
+```
 
-Alternatively, run scripts directly with the configured conda environment:
-conda run -p $CONDA_PREFIX python src/data/process_data.py
-# Or activate the environment first:
-conda activate $CONDA_PREFIX
-python src/data/process_data.py
-## Environment Lock File
+Или выполните шаги по отдельности:
 
-A complete list of dependencies used in this project is available in requirements.lock.txt.
+```bash
+make data
+make features
+make train
+make evaluate
+make report
+```
 
-Note: This file is for reference purposes only and should not be used for installation. The frozen environment may contain platform-specific packages that might not work on other systems. Use requirements.txt for base dependencies instead.
+## Блокировка зависимостей
 
-## Pre-commit Hooks
+Полный список зависимостей доступен в `requirements.lock.txt` (только для чтения, для воспроизводимости). Для установки используйте `requirements.txt`.
 
-This project uses pre-commit hooks for code quality and consistency:
-- ruff: Linting and code formatting
-- black: Code formatting
-- isort: Import sorting
-- nbstripout: Jupyter notebook output removal
+## Pre-commit хуки
 
-To install and enable pre-commit hooks:
+Проект использует pre-commit для качества кода (ruff, black, isort, nbstripout). Установка:
+
+```bash
 pre-commit install
-## Experiment Tracking
+```
 
-Experiments are tracked in experiments/registry.jsonl with the append_jsonl utility.
+## Трекинг экспериментов
 
-## Project Documentation
+Эксперименты логируются в `experiments/registry.jsonl`.
 
-This project includes documentation in the reports/ directory:
-- reports/eda_report.md - Detailed analysis of the dataset, feature distributions, and preprocessing steps
-- reports/final_report.md - Complete project findings, methodology, results, and conclusions
-- docs/standards.md - Coding standards, project structure guidelines, and best practices
+## Документация и отчёты
 
-## Usage and Outputs
-The project generates several outputs:
-- Processed data in data/processed/
-- Trained models in models/
-- Evaluation results in reports/
-- Visualizations in figures/
-- Logs in logs/
+- `reports/eda_report.md` — EDA и предобработка
+- `reports/final_report.md` — Финальные выводы и рекомендации
 
-All processing should be done through the Makefile targets which ensure the proper environment is used.
+## Выходные артефакты
+
+- Обработанные данные: `data/processed/` (или путь из `DATA_PATH`)
+- Обученные модели: `models/`
+- Результаты оценки: `reports/`
+- Графики: `figures/`
+- Логи: `logs/`
+
+Все шаги рекомендуется запускать через `Makefile`, чтобы обеспечить единообразие окружения.
+
 
