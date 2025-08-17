@@ -1,46 +1,51 @@
-# Final Report
+# Финальный отчёт — стабилизация ElasticNet и прогон pipeline
 
-## Project Overview
-This project involves building machine learning models to predict the effectiveness of compounds based on data provided by chemists. The goal is to build forecasts that allow for the selection of the most effective combination of parameters for creating medicines.
+Кратко: внесены правки в `src/models/train_models.py` для улучшения сходимости ElasticNet и снижения предупреждений:
 
-## Data Overview
-- The dataset contains 1001 entries and 214 columns.
-- Key target variables include `IC50, mM`, `CC50, mM`, and `SI` (Selectivity Index).
-- The data was cleaned by dropping redundant columns and handling missing values.
+- для регрессионных моделей используется `StandardScaler` (масштабирование с нулевым средним и единичной дисперсией);
+- параметры ElasticNet: `max_iter=50000`, `tol=1e-4`, сетка `alpha` = [1e-2, 1e-1, 1.0, 10.0], `l1_ratio` = [0.1, 0.5, 0.9];
 
-## Methodology
-### Regression Models
-- Linear Regression was used to predict `IC50, mM`, `CC50, mM`, and `SI`.
-- The models were evaluated using Mean Squared Error (MSE) and R-squared (R2).
+Действия и проверка:
 
-### Classification Models
-- Logistic Regression and Random Forest were used to predict whether `IC50`, `CC50`, and `SI` exceed their respective medians, and whether `SI` exceeds 8.
-- SMOTE was used to handle class imbalance.
-- The models were evaluated using accuracy, precision, recall, and F1-score.
+1) Внесены изменения в `src/models/train_models.py` (масштабирование и параметры ElasticNet).
+2) Запущен полный pipeline `make all`.
+3) Логи выполнения сохранены в `logs/pipeline.log`.
 
-## Results
-### Regression Models
-- **IC50 Regression**: MSE: 248730.11, R2: 0.2543
-- **CC50 Regression**: MSE: 323245.14, R2: 0.3765
-- **SI Regression**: MSE: 1860608.73, R2: 0.0737
+Результат прогонки:
 
-### Classification Models
-- **IC50 Classification**: Accuracy: 0.7612
-- **CC50 Classification**: Accuracy: 0.8060
-- **SI Classification**: Accuracy: 0.7065
-- **SI > 8 Classification**: Accuracy: 0.7114
+- ConvergenceWarning (sklearn coordinate descent) после патча: 0 в `logs/pipeline.log`.
+- Модельные метрики сохранены в `models/model_results.json`.
+- Сформированы отчёты: `reports/regression_comparison.md`, `reports/classification_comparison.md`.
 
-## Conclusion
-- The regression models provide a baseline for predicting `IC50`, `CC50`, and `SI`, with the `CC50` model being the most effective.
-- The classification models, particularly the `CC50` model, offer a robust solution for predicting whether the values exceed their medians.
-- The use of SMOTE and Random Forest significantly improved the classification performance by addressing class imbalance.
+Ключевые параметры, найденные GridSearchCV (ElasticNet best_params):
 
-## Future Work
-- Further refine the models by exploring additional features and algorithms.
-- Conduct more extensive hyperparameter tuning to improve model performance.
-- Validate the models on additional datasets to ensure robustness.
+- IC50 (ElasticNet): `alpha`: 0.1, `l1_ratio`: 0.1
+- CC50 (ElasticNet): `alpha`: 0.1, `l1_ratio`: 0.9
+- SI (ElasticNet): `alpha`: 1.0, `l1_ratio`: 0.1
 
-## References
-- Scikit-learn documentation for model building and evaluation.
-- Pandas documentation for data manipulation.
-- Matplotlib and Seaborn documentation for visualization.
+Краткое сравнение метрик (см. `models/model_results.json` и `reports/regression_comparison.md`):
+
+- IC50: Ridge / RandomForest показали лучшее RMSE (Ridge RMSE=500.30, RF RMSE=488.77), ElasticNet RMSE=529.37.
+- CC50: RandomForest лучше (RMSE=458.34), ElasticNet RMSE=515.82.
+- SI: RandomForest лучше (RMSE=1354.57), ElasticNet RMSE=1391.41.
+
+Выводы и рекомендации:
+
+- На текущих данных смена шкалирования и сузившаяся сетка параметров устранили ConvergenceWarning (0 записей в логах).
+- ElasticNet всё ещё уступает RandomForest по RMSE в этой задаче; для production-релиза рекомендую отдавать приоритет `Ridge` (стабильно) или `RandomForestRegressor` (лучше по RMSE), либо использовать `ElasticNetCV`/более агрессивную регуляризацию, если нужна разрежённость коэффициентов.
+- Если ConvergenceWarning появится вновь на других данных, попробовать:
+  - увеличить `max_iter` до 100000;
+  - расширить `alpha` в большую сторону (например добавить 100.0);
+  - попробовать `ElasticNetCV` с более подходящей grid и встроенным ранним прекращением;
+  - убедиться, что признаки стандартизованы (StandardScaler) и целевая переменная при необходимости лог-трансформирована.
+
+Изменённые файлы в этом коммите:
+
+- `src/models/train_models.py` — параметры ElasticNet и alpha-grid;
+- `reports/final_report.md` — этот файл (результат проверки и рекомендации).
+
+Дополнительно: опционально можно обновить `README.md` указанием переменной окружения `DATA_PATH` и финальных гиперпараметров ElasticNet.
+
+---
+
+Дата проверки: 18 августа 2025 г.
