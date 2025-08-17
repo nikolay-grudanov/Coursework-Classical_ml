@@ -1,69 +1,48 @@
-import pandas as pd
-import matplotlib.pyplot as plt
-import seaborn as sns
+"""Deprecated compatibility wrapper for the canonical data loader.
 
-# If .env exists, try to read data path overrides
-try:
-    from dotenv import load_dotenv
+This module delegates load/save operations to the canonical implementation
+located at ``src/data/load_data.py``. Keep this thin wrapper to preserve
+backwards compatibility for scripts that import ``src.load_data``.
+"""
 
-    load_dotenv()
-except Exception:
-    # dotenv is optional; fall back to environment variables if set
-    pass
+import importlib
+import warnings
+import logging
 
-import os
+logger = logging.getLogger(__name__)
 
-DATA_PATH = os.environ.get("DATA_PATH", "data/data.xlsx")
-# Load the data from the Excel file
-print(f"Loading data from {DATA_PATH}")
-data = pd.read_excel(DATA_PATH)
+_real = None
 
-# Drop the 'Unnamed: 0' column if present
-if "Unnamed: 0" in data.columns:
-    data.drop(columns=["Unnamed: 0"], inplace=True)
 
-# Display the first few rows of the dataframe to understand its structure
-print(data.head())
+def _ensure_real():
+    """Import and cache the canonical loader module.
 
-# Display basic information about the dataframe
-print(data.info())
+    Tries both package-style and relative import paths to be resilient
+    to different invocation contexts (scripts vs package).
+    """
+    global _real
+    if _real is not None:
+        return _real
+    candidates = ["src.data.load_data", "data.load_data"]
+    for c in candidates:
+        try:
+            _real = importlib.import_module(c)
+            logger.debug(f"Using data loader: {c}")
+            return _real
+        except Exception:
+            continue
+    warnings.warn("Could not import canonical data loader (src/data/load_data.py).")
+    raise ImportError("Canonical data loader not found")
 
-# Display summary statistics of the dataframe
-print(data.describe())
 
-# Check for missing values
-print("Total missing values:", data.isnull().sum().sum())
+def load_data(filepath: str):
+    mod = _ensure_real()
+    return mod.load_data(filepath)
 
-# Visualize the distribution of IC50, CC50, and SI if columns exist
-plt.figure(figsize=(15, 5))
 
-if "IC50" in data.columns or "IC50, mM" in data.columns:
-    ic50_col = "IC50" if "IC50" in data.columns else "IC50, mM"
-    plt.subplot(1, 3, 1)
-    sns.histplot(data[ic50_col].dropna(), kde=True)
-    plt.title("IC50 Distribution")
-else:
-    plt.subplot(1, 3, 1)
-    plt.text(0.5, 0.5, "IC50 column not found", ha="center")
+def save_data(data, path: str):
+    mod = _ensure_real()
+    return mod.save_data(data, path)
 
-if "CC50" in data.columns or "CC50, mM" in data.columns:
-    cc50_col = "CC50" if "CC50" in data.columns else "CC50, mM"
-    plt.subplot(1, 3, 2)
-    sns.histplot(data[cc50_col].dropna(), kde=True)
-    plt.title("CC50 Distribution")
-else:
-    plt.subplot(1, 3, 2)
-    plt.text(0.5, 0.5, "CC50 column not found", ha="center")
 
-if "SI" in data.columns:
-    plt.subplot(1, 3, 3)
-    sns.histplot(data["SI"].dropna(), kde=True)
-    plt.title("SI Distribution")
-else:
-    plt.subplot(1, 3, 3)
-    plt.text(0.5, 0.5, "SI column not found", ha="center")
-
-plt.tight_layout()
-plt.show()
-
-print("Data loading and initial inspection completed.")
+__all__ = ["load_data", "save_data"]

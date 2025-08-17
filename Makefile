@@ -24,6 +24,18 @@ CONDA_ENV := $(CONDA_ENV_NAME)
 endif
 endif
 
+# Resolve conda invocation: prefer prefix (-p) when CONDA_PREFIX set,
+# otherwise use environment name (-n) when CONDA_ENV_NAME set.
+ifeq (,$(strip $(CONDA_PREFIX)))
+	ifeq (,$(strip $(CONDA_ENV_NAME)))
+		CONDA_RUN := conda run -n base
+	else
+		CONDA_RUN := conda run -n $(CONDA_ENV_NAME)
+	endif
+else
+	CONDA_RUN := conda run -p $(CONDA_PREFIX)
+endif
+
 # Default target
 .PHONY: all
 all: clean data features train evaluate report
@@ -42,43 +54,49 @@ clean:
 .PHONY: data
 data:
 	@echo "Processing raw data..."
-	@conda run -p $(CONDA_ENV) $(PYTHON) $(SRC_DIR)/data/process_data.py
+	@$(CONDA_RUN) $(PYTHON) $(SRC_DIR)/data/process_data.py
 
 # Feature engineering
 .PHONY: features
 features:
 	@echo "Engineering features..."
-	@conda run -p $(CONDA_ENV) $(PYTHON) $(SRC_DIR)/features/engineer_features.py
+	@$(CONDA_RUN) $(PYTHON) $(SRC_DIR)/features/engineer_features.py
 
 # Model training
 .PHONY: train
 train:
 	@echo "Training models..."
-	@conda run -p $(CONDA_ENV) $(PYTHON) $(SRC_DIR)/models/train_models.py
+	@$(CONDA_RUN) $(PYTHON) $(SRC_DIR)/models/train_models.py
 
 # Model evaluation
 .PHONY: evaluate
 evaluate:
 	@echo "Evaluating models..."
-	@conda run -p $(CONDA_ENV) $(PYTHON) $(SRC_DIR)/eval/evaluate_models.py
+	@$(CONDA_RUN) $(PYTHON) $(SRC_DIR)/eval/evaluate_models.py
 
 # Generate report
 .PHONY: report
 report:
 	@echo "Generating reports..."
-	@conda run -p $(CONDA_ENV) $(PYTHON) $(SRC_DIR)/eval/generate_report.py
+	@$(CONDA_RUN) $(PYTHON) $(SRC_DIR)/eval/generate_report.py
 
 # Run exploratory data analysis
 .PHONY: eda
 eda:
 	@echo "Running exploratory data analysis..."
-	@conda run -p $(CONDA_ENV) $(PYTHON) $(SRC_DIR)/data/eda.py
+	@$(CONDA_RUN) $(PYTHON) $(SRC_DIR)/data/eda.py
+
+# Quick data integrity check
+.PHONY: check-data
+check-data:
+	@echo "Running data integrity checks..."
+	@$(CONDA_RUN) $(PYTHON) scripts/check_data_integrity.py
 
 # Install dependencies
 .PHONY: install
 install:
 	@echo "Installing dependencies..."
-	@conda run -p $(CONDA_ENV) pip install -r requirements.txt
+	@$(CONDA_RUN) pip install -r requirements.txt
 
 # Run Jupyter notebooks
 .PHONY: notebooks
@@ -90,13 +108,13 @@ notebooks:
 .PHONY: ic50_stability
 ic50_stability:
 	@echo "Running IC50 stabilization experiments (do not run by default)"
-	@conda run -p $(CONDA_ENV) $(PYTHON) $(SRC_DIR)/ic50_stabilize_T3.py
+	@$(CONDA_RUN) $(PYTHON) $(SRC_DIR)/ic50_stabilize_T3.py
 
 .PHONY: si8_oof
 si8_oof:
 	@echo "Generate OOF predictions and plots for SI>=8 classification"
-	@conda run -p $(CONDA_ENV) $(PYTHON) -m pip install --quiet PyYAML >/dev/null 2>&1 || true
-	@conda run -p $(CONDA_ENV) $(PYTHON) $(SRC_DIR)/eval/generate_baselines_t3.py
+	@$(CONDA_RUN) $(PYTHON) -m pip install --quiet PyYAML >/dev/null 2>&1 || true
+	@$(CONDA_RUN) $(PYTHON) $(SRC_DIR)/eval/generate_baselines_t3.py
 
 .PHONY: baselines_t3
 baselines_t3:
