@@ -38,7 +38,7 @@ endif
 
 # Default target
 .PHONY: all
-all: clean data features train evaluate report
+all: clean check-config data features train evaluate report
 
 # Clean previous outputs
 .PHONY: clean
@@ -56,6 +56,13 @@ data:
 	@echo "Processing raw data..."
 	@$(CONDA_RUN) $(PYTHON) $(SRC_DIR)/data/process_data.py
 
+
+# Quick config sanity check: validate that paths referenced in configs/model_config.yaml exist.
+.PHONY: check-config
+check-config:
+	@echo "Validating configuration paths in configs/model_config.yaml..."
+	@$(CONDA_RUN) $(PYTHON) scripts/check_config.py
+
 # Feature engineering
 .PHONY: features
 features:
@@ -66,7 +73,7 @@ features:
 .PHONY: train
 train:
 	@echo "Training models..."
-	@$(CONDA_RUN) $(PYTHON) $(SRC_DIR)/models/train_models.py
+	@$(CONDA_RUN) $(PYTHON) $(SRC_DIR)/main.py
 
 # Model evaluation
 .PHONY: evaluate
