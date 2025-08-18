@@ -248,3 +248,80 @@ def save_model_results(results: Dict[str, Any], path: str) -> None:
     with p.open("w") as fh:
         json.dump(results, fh, indent=2)
     logger.info(f"Saved model results to {path}")
+
+
+def _load_feature_data(path: str = "data/feature_engineered_data.csv"):
+    """Load feature engineered data as a DataFrame. Minimal helper for notebooks.
+
+    Returns a tuple (X, y_dict) where y_dict maps target names to series.
+    """
+    import pandas as pd
+
+    p = Path(path)
+    if not p.exists():
+        raise FileNotFoundError(f"Feature data not found at {p.resolve()}")
+    df = pd.read_csv(p)
+    # infer feature columns as all except known target names if present
+    targets = [
+        c
+        for c in df.columns
+        if c.lower() in ("ic50", "cc50", "si") or c.lower().endswith("_class")
+    ]
+    if not targets:
+        # fallback: try common names
+        for name in ("IC50", "CC50", "SI"):
+            if name in df.columns:
+                targets.append(name)
+    X = df.drop(columns=targets, errors="ignore")
+    y_dict = {t: df[t] for t in targets}
+    return X, y_dict
+
+
+def train_regression_tasks(
+    save_models: bool = True, feature_path: str = "data/feature_engineered_data.csv"
+):
+    """Convenience runner that trains regression models for available regression targets.
+
+    Returns a dict with per-target results.
+    """
+    from sklearn.model_selection import train_test_split
+
+    X, y_dict = _load_feature_data(feature_path)
+    results = {}
+    for target, y in y_dict.items():
+        # treat non-class targets as regression targets
+        if str(target).lower().endswith("_class"):
+            continue
+        X_train, X_test, y_train, y_test = train_test_split(
+            X, y, test_size=0.2, random_state=42
+        )
+        res = train_regression_models(X_train, y_train, X_test, y_test, target)
+        results[target] = res
+    if save_models:
+        save_model_results(results, "models/model_results_from_notebook.json")
+    return results
+
+
+def train_classification_tasks(
+    save_models: bool = True, feature_path: str = "data/feature_engineered_data.csv"
+):
+    """Convenience runner that trains classification models for available classification targets.
+
+    Returns a dict with per-target results.
+    """
+    from sklearn.model_selection import train_test_split
+
+    X, y_dict = _load_feature_data(feature_path)
+    results = {}
+    for target, y in y_dict.items():
+        # only class targets
+        if not str(target).lower().endswith("_class"):
+            continue
+        X_train, X_test, y_train, y_test = train_test_split(
+            X, y, test_size=0.2, random_state=42, stratify=y
+        )
+        res = train_classification_models(X_train, y_train, X_test, y_test, target)
+        results[target] = res
+    if save_models:
+        save_model_results(results, "models/classification_results_from_notebook.json")
+    return results

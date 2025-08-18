@@ -111,6 +111,46 @@ notebooks:
 	@echo "Starting Jupyter notebook..."
 	@conda run -p $(CONDA_ENV) jupyter notebook notebooks/
 
+# Run notebooks non-interactively (execute and save outputs)
+.PHONY: run-notebooks
+run-notebooks: run-notebook-data run-notebook-regression run-notebook-classification
+run-notebooks: run-notebook-eda run-notebook-data run-notebook-regression run-notebook-classification
+
+.PHONY: run-notebook-eda
+run-notebook-eda:
+	@echo "Executing EDA notebook..."
+	@$(CONDA_RUN) jupyter nbconvert --to notebook --execute notebooks/01_eda.ipynb --output 01_eda.executed.ipynb --ExecutePreprocessor.timeout=600
+
+.PHONY: run-notebook-data
+run-notebook-data:
+	@echo "Executing data preprocessing notebook..."
+	@$(CONDA_RUN) jupyter nbconvert --to notebook --execute notebooks/02_data.ipynb --output 02_data.executed.ipynb --ExecutePreprocessor.timeout=600
+
+.PHONY: run-notebook-regression
+run-notebook-regression:
+	@echo "Executing regression modelling notebook..."
+	@$(CONDA_RUN) jupyter nbconvert --to notebook --execute notebooks/03_regression.ipynb --output 03_regression.executed.ipynb --ExecutePreprocessor.timeout=1200
+
+.PHONY: run-notebook-reg-ic50
+run-notebook-reg-ic50:
+	@echo "Executing regression (IC50) notebook..."
+	@$(CONDA_RUN) jupyter nbconvert --to notebook --execute notebooks/03_regression_IC50.ipynb --output 03_regression_IC50.executed.ipynb --ExecutePreprocessor.timeout=1200
+
+.PHONY: run-notebook-reg-cc50
+run-notebook-reg-cc50:
+	@echo "Executing regression (CC50) notebook..."
+	@$(CONDA_RUN) jupyter nbconvert --to notebook --execute notebooks/03_regression_CC50.ipynb --output 03_regression_CC50.executed.ipynb --ExecutePreprocessor.timeout=1200
+
+.PHONY: run-notebook-reg-si
+run-notebook-reg-si:
+	@echo "Executing regression (SI) notebook..."
+	@$(CONDA_RUN) jupyter nbconvert --to notebook --execute notebooks/03_regression_SI.ipynb --output 03_regression_SI.executed.ipynb --ExecutePreprocessor.timeout=1200
+
+.PHONY: run-notebook-classification
+run-notebook-classification:
+	@echo "Executing classification modelling notebook..."
+	@$(CONDA_RUN) jupyter nbconvert --to notebook --execute notebooks/04_classification.ipynb --output 04_classification.executed.ipynb --ExecutePreprocessor.timeout=1200
+
 # Additional targets for coursework
 .PHONY: ic50_stability
 ic50_stability:
