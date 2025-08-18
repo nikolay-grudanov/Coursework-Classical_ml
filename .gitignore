@@ -221,4 +221,7 @@ outputs/
 artifacts/
 reports/
 figures/
-
+sys 
+.cache/
+temp/
+steps/**
